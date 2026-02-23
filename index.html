@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAME — Video Editor Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #050505;
+    --white: #f0ede8;
+    --red: #e63027;
+    --gold: #c9a84c;
+    --grey: #1a1a1a;
+    --mid: #333;
+    --dim: #888;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Raleway', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ─── CUSTOM CURSOR ─── */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(240,237,232,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s;
+  }
+  body:has(a:hover) .cursor, body:has(button:hover) .cursor { width: 20px; height: 20px; background: var(--gold); }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 60px; height: 60px; }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.4;
+  }
+
+  /* ─── LOADER ─── */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease 0.3s, visibility 0.8s ease 0.3s;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 20vw, 180px);
+    line-height: 1;
+    color: var(--white);
+    letter-spacing: -2px;
+  }
+  .loader-bar {
+    width: 200px;
+    height: 1px;
+    background: var(--mid);
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .loader-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--red);
+    width: 0%;
+    transition: width 0.05s linear;
+  }
+  .loader-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    margin-top: 14px;
+    text-transform: uppercase;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-decoration: none;
+    text-transform: uppercase;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ─── HERO ─── */
+  #hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Film strip top */
+  .filmstrip {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .filmstrip-track {
+    display: flex;
+    gap: 4px;
+    animation: filmRoll 12s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes filmRoll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .filmstrip-hole {
+    width: 60px;
+    height: 70px;
+    border: 2px solid #1f1f1f;
+    border-radius: 4px;
+    background: #0a0a0a;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .filmstrip-hole::before {
+    content: '';
+    width: 28px; height: 18px;
+    border-radius: 2px;
+    background: linear-gradient(135deg, #1a1a1a, #111);
+  }
+
+  /* Timecode */
+  .timecode {
+    position: absolute;
+    top: 100px;
+    right: 48px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    opacity: 0.7;
+  }
+
+  /* Scanlines effect */
+  #hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* Hero BG image placeholder */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0d0d0d 100%);
+    z-index: -1;
+  }
+  /* ★ REPLACE: Add your hero background image below */
+  /* .hero-bg { background-image: url('your-hero-image.jpg'); background-size: cover; background-position: center; } */
+
+  .hero-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(5,5,5,1) 0%, rgba(5,5,5,0.4) 60%, rgba(5,5,5,0.7) 100%);
+    z-index: -1;
+  }
+
+  /* Glitch text */
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 1.2s forwards;
+  }
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 13vw, 180px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    position: relative;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.4s forwards;
+  }
+  .hero-name .glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .hero-name .glitch::before,
+  .hero-name .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .hero-name .glitch::before {
+    color: var(--red);
+    clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+    animation: glitch1 4s infinite 2s;
+  }
+  .hero-name .glitch::after {
+    color: #00cfff;
+    clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+    animation: glitch2 4s infinite 2s;
+  }
+  @keyframes glitch1 {
+    0%,90%,100% { transform: translateX(0); opacity: 0; }
+    91% { transform: translateX(-4px); opacity: 0.8; }
+    93% { transform: translateX(4px); opacity: 0.8; }
+    95% { transform: translateX(-2px); opacity: 0.8; }
+    97% { transform: translateX(0); opacity: 0; }
+  }
+  @keyframes glitch2 {
+    0%,90%,100% { transform: translateX(0); opacity: 0; }
+    92% { transform: translateX(4px); opacity: 0.6; }
+    94% { transform: translateX(-4px); opacity: 0.6; }
+    96% { transform: translateX(2px); opacity: 0.6; }
+    98% { transform: translateX(0); opacity: 0; }
+  }
+
+  .hero-role {
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(14px, 2vw, 22px);
+    font-weight: 100;
+    letter-spacing: 8px;
+    color: var(--white);
+    opacity: 0;
+    margin-top: 12px;
+    animation: fadeUp 0.8s ease 1.6s forwards;
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.8s forwards;
+  }
+  .hero-desc {
+    max-width: 340px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--dim);
+    font-weight: 300;
+  }
+  .hero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 32px;
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: none;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .btn-primary:hover { background: #ff3e34; transform: translateY(-2px); }
+  .btn-primary .arrow { transition: transform 0.3s; }
+  .btn-primary:hover .arrow { transform: translateX(4px); }
+
+  .scroll-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--dim);
+    animation: scrollPulse 2s ease infinite;
+  }
+  @keyframes scrollPulse {
+    0%,100% { width: 40px; }
+    50% { width: 70px; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── REEL SECTION ─── */
+  #reel {
+    padding: 120px 48px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 48px;
+  }
+  .reel-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #0d0d0d;
+    border: 1px solid #1f1f1f;
+    overflow: hidden;
+    cursor: none;
+  }
+  /* ★ REPLACE: Embed your showreel video below */
+  /* <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" ...></iframe> */
+  .reel-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: linear-gradient(135deg, #0d0d0d, #151515);
+  }
+  .reel-placeholder-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+  }
+  .play-btn {
+    width: 80px; height: 80px;
+    border: 2px solid var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: none;
+  }
+  .play-btn:hover { border-color: var(--red); transform: scale(1.1); }
+  .play-btn::after {
+    content: '';
+    border-style: solid;
+    border-width: 12px 0 12px 22px;
+    border-color: transparent transparent transparent var(--white);
+    margin-left: 4px;
+    transition: border-color 0.3s;
+  }
+  .reel-container:hover .play-btn::after { border-color: transparent transparent transparent var(--red); }
+  .reel-label-z {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── ABOUT SECTION ─── */
+  #about {
+    padding: 120px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .about-image-wrap {
+    position: relative;
+  }
+  .about-image {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+    background: #111;
+    /* ★ REPLACE: <img src="your-photo.jpg" ... /> */
+  }
+  .about-img-placeholder {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: linear-gradient(160deg, #141414, #0d0d0d);
+    border: 1px solid #1f1f1f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+  .about-img-placeholder svg { opacity: 0.3; }
+  .about-image-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -12px -12px 12px 12px;
+    border: 1px solid #1f1f1f;
+    z-index: -1;
+    transition: transform 0.4s ease;
+  }
+  .about-image-wrap:hover::before { transform: translate(-4px, -4px); }
+  .about-corner {
+    position: absolute;
+    bottom: -20px; right: -20px;
+    background: var(--red);
+    padding: 16px 20px;
+  }
+  .about-corner-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    display: block;
+  }
+  .about-corner-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(240,237,232,0.7);
+    display: block;
+  }
+  .about-text p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--dim);
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+  .about-text p em { color: var(--white); font-style: normal; }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #1a1a1a;
+    margin-top: 40px;
+    border: 1px solid #1a1a1a;
+  }
+  .skill-item {
+    background: var(--black);
+    padding: 16px 20px;
+  }
+  .skill-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .skill-bar { height: 2px; background: #1a1a1a; position: relative; }
+  .skill-fill {
+    position: absolute;
+    top: 0; left: 0; height: 100%;
+    background: var(--red);
+    width: 0%;
+    transition: width 1.2s ease;
+  }
+  .skill-item.visible .skill-fill { width: var(--pct); }
+
+  /* ─── PROJECTS ─── */
+  #projects {
+    padding: 120px 48px;
+  }
+  .projects-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .project-card {
+    position: relative;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #0d0d0d;
+    cursor: none;
+  }
+  .project-card:first-child { grid-column: 1 / -1; aspect-ratio: 21/9; }
+  .project-img-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #111, #0d0d0d);
+    transition: transform 0.6s ease;
+  }
+  /* ★ REPLACE each placeholder with: <img src="project-N.jpg" style="width:100%;height:100%;object-fit:cover;"> */
+  .project-ph-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #2a2a2a;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .project-card:hover .project-img-placeholder { transform: scale(1.05); }
+
+  .project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .project-card:hover .project-overlay { opacity: 1; transform: translateY(0); }
+  .project-cat {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .project-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(24px, 3vw, 36px);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .project-year {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 8px;
+  }
+
+  /* ─── STATS ─── */
+  #stats {
+    padding: 100px 48px;
+    background: var(--grey);
+    border-top: 1px solid #1f1f1f;
+    border-bottom: 1px solid #1f1f1f;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #111;
+  }
+  .stat-block {
+    background: var(--black);
+    padding: 48px 36px;
+    border-left: 1px solid #1a1a1a;
+  }
+  .stat-block:first-child { border-left: none; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 90px);
+    line-height: 1;
+    color: var(--white);
+    display: block;
+  }
+  .stat-num span { color: var(--red); }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-top: 8px;
+    display: block;
+  }
+
+  /* ─── PROCESS ─── */
+  #process {
+    padding: 120px 48px;
+  }
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+    background: #1a1a1a;
+  }
+  .process-step {
+    background: var(--black);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .process-step:hover { background: #0d0d0d; }
+  .process-step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    line-height: 1;
+    color: #1a1a1a;
+    position: absolute;
+    top: -8px; right: 16px;
+    transition: color 0.3s;
+  }
+  .process-step:hover .process-step-num { color: #1f1f1f; }
+  .process-step-icon {
+    width: 40px; height: 40px;
+    border: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: var(--red);
+  }
+  .process-step-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .process-step-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--dim);
+    font-weight: 300;
+  }
+
+  /* ─── CONTACT ─── */
+  #contact {
+    padding: 120px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    border-top: 1px solid #1a1a1a;
+  }
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(50px, 8vw, 110px);
+    line-height: 0.9;
+    letter-spacing: -1px;
+  }
+  .contact-title .accent { color: var(--red); }
+  .contact-sub {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--dim);
+    margin-top: 24px;
+    font-weight: 300;
+    max-width: 320px;
+  }
+  .contact-links {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border: 1px solid #1a1a1a;
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .contact-link:hover { border-color: var(--red); background: rgba(230,48,39,0.05); }
+  .contact-link .cl-type {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+    min-width: 60px;
+  }
+  .contact-form { display: flex; flex-direction: column; gap: 2px; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    padding: 12px 16px 0;
+    background: #0d0d0d;
+    border: 1px solid #1a1a1a;
+    border-bottom: none;
+  }
+  .form-group input, .form-group textarea {
+    background: #0d0d0d;
+    border: 1px solid #1a1a1a;
+    border-top: none;
+    color: var(--white);
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    padding: 8px 16px 14px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.3s;
+    cursor: none;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--red); }
+  .form-group textarea { min-height: 120px; }
+  .form-submit {
+    margin-top: 8px;
+    padding: 16px;
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .form-submit:hover { background: #ff3e34; transform: translateY(-1px); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .foot-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--white);
+  }
+  footer .foot-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+  }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    #hero { padding: 0 24px 60px; }
+    #reel, #about, #projects, #process, #contact, footer { padding: 80px 24px; }
+    #about { grid-template-columns: 1fr; gap: 48px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card:first-child { grid-column: 1; aspect-ratio: 16/10; }
+    #stats { grid-template-columns: 1fr 1fr; }
+    .stat-block:nth-child(3) { border-left: none; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    #contact { grid-template-columns: 1fr; gap: 48px; }
+    .hero-bottom { flex-direction: column; align-items: flex-start; gap: 24px; }
+    .projects-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-count" id="loaderCount">0</div>
+  <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+  <div class="loader-label">Loading frames</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <!-- ★ REPLACE: Change "FRAME" to your friend's name or brand -->
+  <a href="#" class="nav-logo">FRAME</a>
+  <div class="nav-links">
+    <a href="#reel">Reel</a>
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-overlay"></div>
+
+  <!-- Film strip at top -->
+  <div class="filmstrip">
+    <div class="filmstrip-track" id="filmTrack"></div>
+  </div>
+
+  <!-- Timecode -->
+  <div class="timecode" id="timecode">00:00:00:00</div>
+
+  <!-- Hero content -->
+  <div class="hero-eyebrow">Video Editor / Motion Designer</div>
+  <!-- ★ REPLACE: Change "JOHN" and "DOE" to your friend's name -->
+  <div class="hero-name">
+    <span class="glitch" data-text="pavan">pavan</span><br>
+    <span class="glitch" data-text="ulikanti">ulikanti</span>
+  </div>
+  <div class="hero-role">Telling Stories Through Motion</div>
+
+  <div class="hero-bottom">
+    <!-- ★ REPLACE: Update this description -->
+    <p class="hero-desc">
+      Crafting cinematic experiences that move people. From raw footage to polished masterpieces — every frame tells your story.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary">View My Work <span class="arrow">→</span></a>
+      <div class="scroll-hint"><div class="scroll-line"></div> Scroll to explore</div>
+    </div>
+  </div>
+</section>
+
+<!-- REEL -->
+<section id="reel">
+  <div class="section-label reveal">// Showreel</div>
+  <div class="section-title reveal">The Reel Deal</div>
+
+  <div class="reel-container reveal">
+    <!-- ★ REPLACE: Replace this entire div with your video iframe:
+    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=0" frameborder="0" allowfullscreen></iframe>
+    OR use your video file:
+    <video width="100%" height="100%" controls poster="thumbnail.jpg">
+      <source src="showreel.mp4" type="video/mp4">
+    </video>
+    -->
+    <div class="reel-placeholder">
+      <div class="play-btn"></div>
+      <div class="reel-label-z">[ Place Showreel Video Here ]</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-image-wrap reveal-left">
+    <!-- ★ REPLACE: Replace this div with: <img src="your-photo.jpg" alt="Your Name" class="about-image"> -->
+    <img src="profile.png" alt="pavan ulikanti" class="about-image">
+    <!-- ★ REPLACE: Update the years of experience number -->
+    <div class="about-corner">
+      <span class="about-corner-num">7+</span>
+      <span class="about-corner-text">Years of<br>Experience</span>
+    </div>
+  </div>
+
+  <div class="about-text reveal-right">
+    <div class="section-label">// About Me</div>
+    <div class="section-title">The Person Behind the Timeline</div>
+    <!-- ★ REPLACE: Update all the text below with your friend's actual bio -->
+    <p>I'm <em>pavan ulikanti</em>, a video editor and motion designer obsessed with the craft of visual storytelling. Every cut, every transition, every color grade — it's all intentional.</p>
+    <p>With over <em>7 years of experience</em> working with brands, filmmakers, and content creators, I've mastered the art of turning raw footage into something that truly <em>resonates</em>.</p>
+    <p>My philosophy: great editing is <em>invisible</em>. The viewer should feel the story, not see the edits.</p>
+
+    <div class="skills-grid">
+      <!-- ★ REPLACE: Update skills and percentages as needed -->
+      <div class="skill-item" style="--pct: 95%">
+        <div class="skill-name">Premiere Pro</div>
+        <div class="skill-bar"><div class="skill-fill"></div></div>
+      </div>
+      <div class="skill-item" style="--pct: 90%">
+        <div class="skill-name">After Effects</div>
+        <div class="skill-bar"><div class="skill-fill"></div></div>
+      </div>
+      <div class="skill-item" style="--pct: 85%">
+        <div class="skill-name">DaVinci Resolve</div>
+        <div class="skill-bar"><div class="skill-fill"></div></div>
+      </div>
+      <div class="skill-item" style="--pct: 80%">
+        <div class="skill-name">Motion Graphics</div>
+        <div class="skill-bar"><div class="skill-fill"></div></div>
+      </div>
+      <div class="skill-item" style="--pct: 75%">
+        <div class="skill-name">Color Grading</div>
+        <div class="skill-bar"><div class="skill-fill"></div></div>
+      </div>
+      <div class="skill-item" style="--pct: 70%">
+        <div class="skill-name">Sound Design</div>
+        <div class="skill-bar"><div class="skill-fill"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-header">
+    <div>
+      <div class="section-label reveal">// Selected Work</div>
+      <div class="section-title reveal">Projects That Hit Different</div>
+    </div>
+    <a href="#contact" class="btn-primary reveal">Work With Me →</a>
+  </div>
+
+  <div class="projects-grid">
+    <!-- ★ REPLACE: For each project card, replace the placeholder div with your actual thumbnail image -->
+    <!-- PROJECT 1 (Featured - Full Width) -->
+    <div class="project-card reveal" data-video="https://youtu.be/C0FaL0aZgHk?si=-SanR0aseCf3Uzzp">
+      <!-- ★ REPLACE: <img src="project1-thumbnail.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
+      <div class="project-img-placeholder">
+        <img src="project1.png" alt="Project 1 thumbnail" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="project-overlay">
+        <!-- ★ REPLACE: Update category, title, and year -->
+        <div class="project-cat">Brand Film</div>
+        <div class="project-title">Project Title One</div>
+        <div class="project-year">2024 — Client Name</div>
+      </div>
+    </div>
+
+    <!-- PROJECT 2 -->
+    <div class="project-card reveal" data-video="https://youtu.be/JAaYHcLlRRk?si=giZJTvp-_12gbuTV">
+      <div class="project-img-placeholder">
+        <img src="project2.png" alt="Project 2 thumbnail" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="project-overlay">
+        <div class="project-cat">Music Video</div>
+        <div class="project-title">Project Title Two</div>
+        <div class="project-year">2024 — Client Name</div>
+      </div>
+    </div>
+
+    <!-- PROJECT 3 -->
+    <div class="project-card reveal" data-video="https://youtu.be/HAcMmucbdxI?si=qwtCmZrfMmNHCPE0">
+      <div class="project-img-placeholder">
+        <img src="project3.png" alt="Project 3 thumbnail" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="project-overlay">
+        <div class="project-cat">Documentary</div>
+        <div class="project-title">Project Title Three</div>
+        <div class="project-year">2023 — Client Name</div>
+      </div>
+    </div>
+
+    <!-- PROJECT 4 -->
+    <div class="project-card reveal" data-video="https://youtu.be/NN-juNokE2o?si=F6ySmLCiN4bTbPtt">
+      <div class="project-img-placeholder">
+        <img src="project4.png" alt="Project 4 thumbnail" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="project-overlay">
+        <div class="project-cat">Commercial</div>
+        <div class="project-title">Project Title Four</div>
+        <div class="project-year">2023 — Client Name</div>
+      </div>
+    </div>
+
+    <!-- PROJECT 5 -->
+    <div class="project-card reveal" data-video="https://youtu.be/C0FaL0aZgHk?si=MgAXgWGaZRDOcf0Q">
+      <div class="project-img-placeholder">
+        <img src="project5.png" alt="Project 5 thumbnail" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="project-overlay">
+        <div class="project-cat">Short Film</div>
+        <div class="project-title">Project Title Five</div>
+        <div class="project-year">2023 — Client Name</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <!-- ★ REPLACE: Update all numbers to match your friend's actual stats -->
+  <div class="stat-block reveal">
+    <span class="stat-num">120<span>+</span></span>
+    <span class="stat-label">Projects Completed</span>
+  </div>
+  <div class="stat-block reveal">
+    <span class="stat-num">7<span>+</span></span>
+    <span class="stat-label">Years Experience</span>
+  </div>
+  <div class="stat-block reveal">
+    <span class="stat-num">50<span>+</span></span>
+    <span class="stat-label">Happy Clients</span>
+  </div>
+  <div class="stat-block reveal">
+    <span class="stat-num">5<span>M</span></span>
+    <span class="stat-label">Views Generated</span>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-label reveal">// How I Work</div>
+  <div class="section-title reveal">The Process</div>
+
+  <div class="process-steps">
+    <div class="process-step reveal">
+      <div class="process-step-num">01</div>
+      <div class="process-step-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="process-step-title">Discovery</div>
+      <div class="process-step-desc">Understanding your vision, brand, and what story you want to tell. We align on goals before a single frame is touched.</div>
+    </div>
+    <div class="process-step reveal">
+      <div class="process-step-num">02</div>
+      <div class="process-step-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="process-step-title">Assembly</div>
+      <div class="process-step-desc">Sorting through footage, building structure, and crafting the initial rough cut that forms the backbone of the story.</div>
+    </div>
+    <div class="process-step reveal">
+      <div class="process-step-num">03</div>
+      <div class="process-step-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <div class="process-step-title">Polish</div>
+      <div class="process-step-desc">Color grading, motion graphics, sound design, and the thousand small decisions that elevate good to great.</div>
+    </div>
+    <div class="process-step reveal">
+      <div class="process-step-num">04</div>
+      <div class="process-step-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="process-step-title">Delivery</div>
+      <div class="process-step-desc">Export in any format needed, with full revision rounds to make sure every detail is exactly right before handoff.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="reveal-left">
+    <div class="section-label">// Get In Touch</div>
+    <div class="contact-title">Let's <span class="accent">Create</span> Something.</div>
+    <!-- ★ REPLACE: Update the description below -->
+    <p class="contact-sub">Have a project in mind? Whether it's a brand film, music video, or social content — I'd love to hear about it.</p>
+
+    <div class="contact-links">
+      <!-- ★ REPLACE: Update email, Instagram, LinkedIn links -->
+      <a href="mailto:upavan2007@gmail.com" class="contact-link">
+        <span class="cl-type">Email</span>
+        upavan2007@gmail.com
+      </a>
+      <a href="https://www.instagram.com/pavan_edit._z?utm_source=qr&igsh=MTRkNjR4OXl5NTNmYw%3D%3D" class="contact-link" target="_blank">
+        <span class="cl-type">Instagram</span>
+        @pavan_edit._z
+      </a>
+      <a href="https://in.linkedin.com/in/pavan-kumar-ullikanti-8b4b193b2" class="contact-link" target="_blank">
+        <span class="cl-type">LinkedIn</span>
+        in.linkedin.com/in/pavan-kumar-ullikanti-8b4b193b2
+      </a>
+    </div>
+  </div>
+
+  <div class="contact-form reveal-right">
+    <!-- ★ REPLACE: Connect this form to your backend or Formspree (https://formspree.io) -->
+    <!-- To use Formspree: change the action attribute to your Formspree endpoint -->
+    <form onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" placeholder="John Smith" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="john@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Project Type</label>
+        <input type="text" placeholder="Brand Film, Music Video, Commercial...">
+      </div>
+      <div class="form-group">
+        <label>Tell Me About Your Project</label>
+        <textarea placeholder="Describe your vision, timeline, and budget..."></textarea>
+      </div>
+      <button type="submit" class="form-submit">Send Message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <!-- ★ REPLACE: Update brand name and your friend's name -->
+  <div class="foot-logo">FRAME</div>
+  <div class="foot-copy">© 2024 pavan ulikanti. All rights reserved.</div>
+</footer>
+
+<script>
+  // ─── CURSOR ───
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  // ─── LOADER ───
+  const loaderCount = document.getElementById('loaderCount');
+  const loaderFill = document.getElementById('loaderFill');
+  const loader = document.getElementById('loader');
+  let count = 0;
+  const iv = setInterval(() => {
+    count += Math.ceil(Math.random() * 8);
+    if (count >= 100) { count = 100; clearInterval(iv); setTimeout(() => loader.classList.add('hidden'), 400); }
+    loaderCount.textContent = count;
+    loaderFill.style.width = count + '%';
+  }, 40);
+
+  // ─── FILM STRIP ───
+  const track = document.getElementById('filmTrack');
+  for (let i = 0; i < 60; i++) {
+    const hole = document.createElement('div');
+    hole.className = 'filmstrip-hole';
+    track.appendChild(hole);
+  }
+
+  // ─── TIMECODE ───
+  const tc = document.getElementById('timecode');
+  function pad(n) { return String(n).padStart(2,'0'); }
+  function updateTC() {
+    const now = new Date();
+    const fr = Math.floor(Date.now() / 33 % 30);
+    tc.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}:${pad(fr)}`;
+  }
+  setInterval(updateTC, 33);
+
+  // ─── SCROLL REVEAL ───
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const delay = el.dataset.delay || 0;
+        setTimeout(() => el.classList.add('visible'), delay);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.15 });
+  // stagger children in grid sections
+  document.querySelectorAll('.projects-grid .project-card, .process-steps .process-step, #stats .stat-block, .skills-grid .skill-item').forEach((el, i) => {
+    el.dataset.delay = i * 80;
+  });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ─── SKILL BARS ───
+  const skillObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        skillObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.skill-item').forEach(el => skillObserver.observe(el));
+
+  // ─── FORM SUBMIT ───
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = 'Sending...';
+    setTimeout(() => { btn.textContent = 'Message Sent ✓'; }, 1500);
+  }
+
+  document.querySelectorAll('.project-card[data-video]').forEach(card => {
+    card.addEventListener('click', () => {
+      const url = card.dataset.video;
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    });
+  });
+
+  // ─── REEL CLICK ───
+  document.querySelector('.reel-container').addEventListener('click', () => {
+    // ★ REPLACE: When you add a real video, remove this click handler
+    alert('Replace this placeholder with your actual showreel video!');
+  });
+</script>
+</body>
+</html>
