@@ -387,63 +387,49 @@
     margin-bottom: 48px;
   }
   .reel-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: #0d0d0d;
-    border: 1px solid #1f1f1f;
-    overflow: hidden;
-    cursor: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+    background: #1a1a1a;
   }
   /* ★ REPLACE: Embed your showreel video below */
   /* <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" ...></iframe> */
-  .reel-placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    background: linear-gradient(135deg, #0d0d0d, #151515);
-  }
-  .reel-placeholder-img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    position: absolute;
-    inset: 0;
-    opacity: 0.3;
-  }
-  .play-btn {
-    width: 80px; height: 80px;
-    border: 2px solid var(--white);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .reel-card {
     position: relative;
-    z-index: 1;
-    transition: border-color 0.3s, transform 0.3s;
+    aspect-ratio: 9/16;
+    overflow: hidden;
+    background: #0d0d0d;
+    border: 1px solid #1f1f1f;
+    text-decoration: none;
+    color: var(--white);
     cursor: none;
   }
-  .play-btn:hover { border-color: var(--red); transform: scale(1.1); }
-  .play-btn::after {
-    content: '';
-    border-style: solid;
-    border-width: 12px 0 12px 22px;
-    border-color: transparent transparent transparent var(--white);
-    margin-left: 4px;
-    transition: border-color 0.3s;
+  .reel-thumb-placeholder {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #111, #0d0d0d);
+    transition: transform 0.6s ease;
   }
-  .reel-container:hover .play-btn::after { border-color: transparent transparent transparent var(--red); }
-  .reel-label-z {
+  .reel-card:hover .reel-thumb-placeholder { transform: scale(1.05); }
+  .reel-card-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, transparent 70%);
+  }
+  .reel-card-kicker {
     font-family: 'Space Mono', monospace;
-    font-size: 11px;
+    font-size: 9px;
     letter-spacing: 3px;
-    color: var(--dim);
+    color: var(--red);
     text-transform: uppercase;
-    position: relative;
-    z-index: 1;
+    margin-bottom: 6px;
+  }
+  .reel-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(22px, 2.8vw, 34px);
+    letter-spacing: 1px;
+    line-height: 1;
   }
 
   /* ─── ABOUT SECTION ─── */
@@ -854,6 +840,7 @@
     .nav-links { display: none; }
     #hero { padding: 0 24px 60px; }
     #reel, #about, #projects, #process, #contact, footer { padding: 80px 24px; }
+    .reel-container { grid-template-columns: 1fr; }
     #about { grid-template-columns: 1fr; gap: 48px; }
     .projects-grid { grid-template-columns: 1fr; }
     .project-card:first-child { grid-column: 1; aspect-ratio: 16/10; }
@@ -925,25 +912,7 @@
   </div>
 </section>
 
-<!-- REEL -->
-<section id="reel">
-  <div class="section-label reveal">// Showreel</div>
-  <div class="section-title reveal">The Reel Deal</div>
 
-  <div class="reel-container reveal">
-    <!-- ★ REPLACE: Replace this entire div with your video iframe:
-    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=0" frameborder="0" allowfullscreen></iframe>
-    OR use your video file:
-    <video width="100%" height="100%" controls poster="thumbnail.jpg">
-      <source src="showreel.mp4" type="video/mp4">
-    </video>
-    -->
-    <div class="reel-placeholder">
-      <div class="play-btn"></div>
-      <div class="reel-label-z">[ Place Showreel Video Here ]</div>
-    </div>
-  </div>
-</section>
 
 <!-- ABOUT -->
 <section id="about">
@@ -992,6 +961,39 @@
         <div class="skill-bar"><div class="skill-fill"></div></div>
       </div>
     </div>
+  </div>
+</section>
+
+
+<!-- REEL -->
+<section id="reel">
+  <div class="section-label reveal">// Showreel</div>
+  <div class="section-title reveal">The Reel Deal</div>
+
+  <div class="reel-container reveal">
+    <!-- ★ REPLACE: Replace this entire div with your video iframe:
+    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=0" frameborder="0" allowfullscreen></iframe>
+    OR use your video file:
+    <video width="100%" height="100%" controls poster="thumbnail.jpg">
+      <source src="showreel.mp4" type="video/mp4">
+    </video>
+    -->
+    <a class="reel-card" href="https://youtube.com/shorts/y96Dxgrv3fI?si=to8yrxD102kTFgPg" target="_blank" rel="noopener noreferrer">
+      <!-- Add your thumbnail image later inside this div -->
+      <div class="reel-thumb-placeholder"></div>
+      <div class="reel-card-overlay">
+        <div class="reel-card-kicker">Shortform Reel 01</div>
+        <div class="reel-card-title">YouTube Short</div>
+      </div>
+    </a>
+    <a class="reel-card" href="https://youtube.com/shorts/zx7xafW0hCY?si=l8kocVoetOCXL9Fy" target="_blank" rel="noopener noreferrer">
+      <!-- Add your thumbnail image later inside this div -->
+      <div class="reel-thumb-placeholder"></div>
+      <div class="reel-card-overlay">
+        <div class="reel-card-kicker">Shortform Reel 02</div>
+        <div class="reel-card-title">YouTube Short</div>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -1276,12 +1278,6 @@
       const url = card.dataset.video;
       if (url) window.open(url, '_blank', 'noopener,noreferrer');
     });
-  });
-
-  // ─── REEL CLICK ───
-  document.querySelector('.reel-container').addEventListener('click', () => {
-    // ★ REPLACE: When you add a real video, remove this click handler
-    alert('Replace this placeholder with your actual showreel video!');
   });
 </script>
 </body>
