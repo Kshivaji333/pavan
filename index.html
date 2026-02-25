@@ -26,7 +26,7 @@
     color: var(--white);
     font-family: 'Raleway', sans-serif;
     overflow-x: hidden;
-    cursor: none; /* Custom cursor fallback */
+    cursor: none;
   }
 
   /* ─── CUSTOM CURSOR ─── */
@@ -186,7 +186,6 @@
     background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, var(--bg-dark) 80%);
     z-index: -2;
   }
-  /* Film strip top */
   .filmstrip {
     position: absolute;
     top: 90px; left: 0; right: 0;
@@ -221,7 +220,7 @@
     text-transform: uppercase;
     margin-bottom: 20px;
     opacity: 0;
-    animation: fadeUp 0.8s ease 1s forwards;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 1s forwards;
   }
   .hero-name {
     font-family: 'Bebas Neue', sans-serif;
@@ -229,7 +228,7 @@
     line-height: 0.85;
     letter-spacing: 2px;
     opacity: 0;
-    animation: fadeUp 0.8s ease 1.2s forwards;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
     margin-bottom: 24px;
   }
   .hero-name span { display: block; }
@@ -242,7 +241,7 @@
     color: var(--dim);
     font-weight: 300;
     opacity: 0;
-    animation: fadeUp 0.8s ease 1.4s forwards;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 1.4s forwards;
     margin-bottom: 40px;
   }
   
@@ -260,10 +259,10 @@
     text-decoration: none;
     border: 1px solid var(--red);
     cursor: none;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 0 20px rgba(230, 48, 39, 0);
     opacity: 0;
-    animation: fadeUp 0.8s ease 1.6s forwards;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
   }
   .btn-primary:hover { 
     background: transparent; 
@@ -326,7 +325,7 @@
     display: block;
     border-radius: 8px;
     filter: grayscale(100%);
-    transition: filter 0.5s ease;
+    transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .about-image-wrap:hover .about-image { filter: grayscale(0%); }
   
@@ -339,27 +338,43 @@
   }
   .about-text p em { color: var(--white); font-style: normal; font-weight: 500; }
   
+  /* ─── UPGRADED SKILLS SECTION ─── */
   .skills-wrapper {
     margin-top: 40px;
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
   }
   .skill-pill {
-    padding: 10px 20px;
-    border: 1px solid var(--border);
-    border-radius: 50px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
     font-family: 'Space Mono', monospace;
     font-size: 11px;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     color: var(--dim);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Shine effect */
+  .skill-pill::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(230, 48, 39, 0.2), transparent);
+    transition: left 0.5s ease;
   }
   .skill-pill:hover {
-    border-color: var(--red);
     color: var(--white);
-    background: rgba(230, 48, 39, 0.05);
+    border-color: var(--red);
+    background: rgba(230, 48, 39, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(230, 48, 39, 0.25);
   }
+  .skill-pill:hover::before { left: 100%; }
 
   /* ─── PROJECTS ─── */
   .projects-header {
@@ -390,7 +405,6 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     cursor: none;
-    group: hover;
   }
   .video-card.short { aspect-ratio: 9 / 16; }
   .video-card.long { aspect-ratio: 16 / 9; }
@@ -412,7 +426,7 @@
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     opacity: 0;
-    transition: all 0.4s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 2;
   }
   .play-btn svg { width: 20px; height: 20px; fill: var(--white); margin-left: 4px; }
@@ -422,10 +436,10 @@
     position: absolute;
     inset: auto 0 0 0;
     padding: 30px 20px 20px;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 100%);
     z-index: 2;
-    transform: translateY(10px);
-    transition: transform 0.4s ease;
+    transform: translateY(15px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .video-card:hover .video-card-overlay { transform: translateY(0); }
   
@@ -455,7 +469,7 @@
     border-radius: 8px;
     border: 1px solid var(--border);
     position: relative;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
   }
   .process-step:hover { 
     transform: translateY(-8px); 
@@ -464,13 +478,13 @@
   .process-step-num {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 60px;
-    color: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.03);
     position: absolute;
     top: 10px; right: 20px;
     line-height: 1;
-    transition: color 0.3s;
+    transition: color 0.4s ease;
   }
-  .process-step:hover .process-step-num { color: rgba(230, 48, 39, 0.2); }
+  .process-step:hover .process-step-num { color: rgba(230, 48, 39, 0.15); }
   
   .process-step-icon {
     color: var(--red);
@@ -514,12 +528,13 @@
     text-decoration: none;
     font-family: 'Space Mono', monospace;
     font-size: 13px;
-    transition: color 0.3s, transform 0.3s;
+    transition: color 0.3s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .contact-link:hover { color: var(--white); transform: translateX(8px); }
   .contact-link span { color: var(--red); }
 
-  .contact-form { display: flex; flex-direction: column; gap: 32px; }
+  /* ─── UPGRADED FORM ─── */
+  .contact-form { display: flex; flex-direction: column; gap: 36px; margin-top: 10px; }
   .form-group { position: relative; }
   .form-group input, .form-group textarea {
     width: 100%;
@@ -529,28 +544,36 @@
     color: var(--white);
     font-family: 'Raleway', sans-serif;
     font-size: 16px;
-    padding: 12px 0;
+    padding: 10px 0;
     outline: none;
     resize: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s ease;
     cursor: none;
   }
   .form-group textarea { min-height: 100px; }
+  
+  /* Focus States for border */
   .form-group input:focus, .form-group textarea:focus { border-color: var(--red); }
+  
+  /* Floating Label Logic */
   .form-group label {
     position: absolute;
-    top: 12px; left: 0;
+    top: 10px; left: 0;
     font-family: 'Space Mono', monospace;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--dim);
     text-transform: uppercase;
     letter-spacing: 2px;
     pointer-events: none;
-    transition: 0.3s ease all;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .form-group input:focus ~ label, .form-group input:valid ~ label,
-  .form-group textarea:focus ~ label, .form-group textarea:valid ~ label {
-    top: -16px;
+  
+  /* Shift label up if focused or NOT empty (using placeholder trick) */
+  .form-group input:focus ~ label, 
+  .form-group input:not(:placeholder-shown) ~ label,
+  .form-group textarea:focus ~ label, 
+  .form-group textarea:not(:placeholder-shown) ~ label {
+    transform: translateY(-24px);
     font-size: 9px;
     color: var(--red);
   }
@@ -567,9 +590,14 @@
     border: none;
     cursor: none;
     font-weight: bold;
-    transition: all 0.3s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .form-submit:hover { background: var(--red); color: var(--white); }
+  .form-submit:hover { 
+    background: var(--red); 
+    color: var(--white); 
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(230, 48, 39, 0.2);
+  }
 
   /* ─── FOOTER ─── */
   footer {
@@ -592,9 +620,16 @@
     text-transform: uppercase;
   }
 
-  /* ─── SCROLL ANIMATIONS ─── */
-  .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s ease; }
+  /* ─── SCROLL ANIMATIONS (Upgraded Cubic-Bezier) ─── */
+  .reveal { 
+    opacity: 0; 
+    transform: translateY(50px); 
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); 
+  }
   .reveal.visible { opacity: 1; transform: translateY(0); }
+  
+  /* Stagger delays via CSS variable */
+  .reveal.visible { transition-delay: calc(var(--delay) * 1s); }
 
   /* ─── RESPONSIVE ─── */
   @media (max-width: 900px) {
@@ -656,11 +691,11 @@
 </section>
 
 <section id="about">
-  <div class="about-image-wrap reveal">
+  <div class="about-image-wrap reveal" style="--delay: 0;">
     <img src="profile.png" alt="Pavan Ullikanti" class="about-image" onerror="this.src='https://via.placeholder.com/400x500'">
   </div>
 
-  <div class="about-text reveal">
+  <div class="about-text reveal" style="--delay: 0.1;">
     <div class="section-label">Behind the Timeline</div>
     <h2 class="section-title">Editing is Invisible Art.</h2>
     <p>I'm <em>Pavan Ullikanti</em>, a video editor obsessed with the craft of visual storytelling. Every cut, every transition, and every color grade is an intentional choice to keep the audience hooked.</p>
@@ -678,7 +713,7 @@
 </section>
 
 <section id="projects">
-  <div class="projects-header reveal">
+  <div class="projects-header reveal" style="--delay: 0;">
     <div>
       <div class="section-label">Selected Works</div>
       <h2 class="section-title" style="margin-bottom:0;">Projects</h2>
@@ -687,10 +722,10 @@
   </div>
 
   <div class="video-groups">
-    <div class="video-group reveal">
-      <h3 class="video-group-title">Short Form Content</h3>
+    <div class="video-group">
+      <h3 class="video-group-title reveal" style="--delay: 0.1;">Short Form Content</h3>
       <div class="video-grid short-form">
-        <article class="video-card short">
+        <article class="video-card short reveal" style="--delay: 0.1;">
           <div class="video-thumb-placeholder"></div>
           <div class="play-btn">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -700,7 +735,7 @@
             <div class="video-card-title">Dynamic Cuts</div>
           </div>
         </article>
-        <article class="video-card short">
+        <article class="video-card short reveal" style="--delay: 0.2;">
           <div class="video-thumb-placeholder"></div>
           <div class="play-btn">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -710,7 +745,7 @@
             <div class="video-card-title">Podcast Clip</div>
           </div>
         </article>
-        <article class="video-card short">
+        <article class="video-card short reveal" style="--delay: 0.3;">
           <div class="video-thumb-placeholder"></div>
           <div class="play-btn">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -723,10 +758,10 @@
       </div>
     </div>
 
-    <div class="video-group reveal">
-      <h3 class="video-group-title">Long Form Content</h3>
+    <div class="video-group">
+      <h3 class="video-group-title reveal" style="--delay: 0.1;">Long Form Content</h3>
       <div class="video-grid long-form">
-        <article class="video-card long">
+        <article class="video-card long reveal" style="--delay: 0.1;">
           <div class="video-thumb-placeholder"></div>
           <div class="play-btn">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -736,7 +771,7 @@
             <div class="video-card-title">Documentary Style Edit</div>
           </div>
         </article>
-        <article class="video-card long">
+        <article class="video-card long reveal" style="--delay: 0.2;">
           <div class="video-thumb-placeholder"></div>
           <div class="play-btn">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -752,11 +787,11 @@
 </section>
 
 <section id="process">
-  <div class="section-label reveal">Workflow</div>
-  <h2 class="section-title reveal">How I Work</h2>
+  <div class="section-label reveal" style="--delay: 0;">Workflow</div>
+  <h2 class="section-title reveal" style="--delay: 0.1;">How I Work</h2>
 
   <div class="process-steps">
-    <div class="process-step reveal">
+    <div class="process-step reveal" style="--delay: 0.1;">
       <div class="process-step-num">01</div>
       <div class="process-step-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -765,7 +800,7 @@
       <p class="process-step-desc">We align on your goals, brand voice, and the specific emotion you want the audience to feel before I touch a single clip.</p>
     </div>
     
-    <div class="process-step reveal">
+    <div class="process-step reveal" style="--delay: 0.2;">
       <div class="process-step-num">02</div>
       <div class="process-step-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -774,7 +809,7 @@
       <p class="process-step-desc">I sift through the raw footage to build the narrative structure, carving out the pacing and backbone of the story.</p>
     </div>
     
-    <div class="process-step reveal">
+    <div class="process-step reveal" style="--delay: 0.3;">
       <div class="process-step-num">03</div>
       <div class="process-step-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
@@ -783,7 +818,7 @@
       <p class="process-step-desc">This is where the magic happens: seamless transitions, color grading, punchy sound design, and clean motion graphics.</p>
     </div>
     
-    <div class="process-step reveal">
+    <div class="process-step reveal" style="--delay: 0.4;">
       <div class="process-step-num">04</div>
       <div class="process-step-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -795,7 +830,7 @@
 </section>
 
 <section id="contact">
-  <div class="reveal">
+  <div class="reveal" style="--delay: 0;">
     <div class="section-label">Get In Touch</div>
     <h2 class="contact-title">Let's <span class="accent">Create.</span></h2>
     <p style="color:var(--dim); line-height:1.8; max-width:400px;">Have raw footage waiting to be transformed? Whether it's a YouTube video, a commercial reel, or social content — let's talk.</p>
@@ -813,18 +848,18 @@
     </div>
   </div>
 
-  <div class="contact-form reveal">
+  <div class="contact-form reveal" style="--delay: 0.1;">
     <form action="https://formspree.io/f/xeelvvqo" method="POST">
       <div class="form-group">
-        <input type="text" name="name" id="name" required>
+        <input type="text" name="name" id="name" placeholder=" " required>
         <label for="name">Your Name</label>
       </div>
       <div class="form-group">
-        <input type="email" name="email" id="email" required>
+        <input type="email" name="email" id="email" placeholder=" " required>
         <label for="email">Email Address</label>
       </div>
       <div class="form-group">
-        <textarea name="message" id="message" required></textarea>
+        <textarea name="message" id="message" placeholder=" " required></textarea>
         <label for="message">Tell me about your project...</label>
       </div>
       <button type="submit" class="form-submit">Send Message</button>
@@ -851,7 +886,6 @@
   function animateCursor() {
     cursor.style.left = mouseX + 'px';
     cursor.style.top = mouseY + 'px';
-    // Smooth follow for the ring
     ringX += (mouseX - ringX) * 0.15;
     ringY += (mouseY - ringY) * 0.15;
     ring.style.left = ringX + 'px';
@@ -891,7 +925,7 @@
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target); // Reveal only once
+        revealObserver.unobserve(entry.target);
       }
     });
   }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
