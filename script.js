@@ -90,3 +90,116 @@
     ham.classList.remove('open');
     document.body.style.overflow = '';
   }
+
+  /* ── VIDEO GALLERY GENERATION ── */
+  const videos = [
+    { title: 'Creative Daily Stitch', type: 'REEL', file: 'From KlickPin CF Creative daily stitch inspiration for people who love beauty for modern homes for everyday tailoring - Pin-920001030130773167.mp4' },
+    { title: 'Country Progress', type: 'CLIP', file: 'From KlickPin CF Curious country progress reflections with charm and ideas for creative people for modern conversatio - Pin-692358142757858909.mp4' },
+    { title: 'Driftwood Decor', type: 'PROMO', file: 'From KlickPin CF Driftwood nautical decor tips on a budget that bring color comfort and meaning for coastal mood bo - Pin-905223593865059846.mp4' },
+    { title: 'Vision Board Ideas', type: 'INSPIRATION', file: 'From KlickPin CF Save these 11 Unique vision board ideas that are worth saving if you love elegant details and creative inspiration for anyone who loves beautiful - Pin-1103030133784843312.mp4' },
+    { title: 'Tharun Speaks', type: 'INTERVIEW', file: 'tharun-speaks-elM9UbG1.mp4' }
+  ];
+
+  function generateVideoThumbnail(videoFile, callback) {
+    const video = document.createElement('video');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    video.addEventListener('loadedmetadata', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      video.currentTime = 0.5;
+    }, { once: true });
+
+    video.addEventListener('seeked', () => {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      callback(canvas.toDataURL('image/jpeg'));
+    }, { once: true });
+
+    video.src = 'work/' + videoFile;
+    video.muted = true;
+    video.play();
+  }
+
+  function renderVideoGrid() {
+    const grid = document.getElementById('videoGrid');
+    grid.innerHTML = '';
+    
+    videos.forEach((video, index) => {
+      const article = document.createElement('article');
+      article.className = 'video-card short reveal';
+      article.style.setProperty('--delay', `${0.1 + index * 0.08}s`);
+      
+      const thumbnailDiv = document.createElement('div');
+      thumbnailDiv.className = 'video-thumb';
+      
+      // Generate thumbnail from video
+      generateVideoThumbnail(video.file, (dataUrl) => {
+        thumbnailDiv.style.backgroundImage = `url('${dataUrl}')`;
+        thumbnailDiv.style.backgroundSize = 'cover';
+        thumbnailDiv.style.backgroundPosition = 'center';
+      });
+      
+      const badge = document.createElement('div');
+      badge.className = 'video-badge';
+      badge.textContent = video.type;
+      
+      const playBtn = document.createElement('div');
+      playBtn.className = 'play-btn';
+      playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>';
+      playBtn.onclick = () => playVideo('work/' + video.file);
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'video-card-overlay';
+      overlay.innerHTML = `
+        <div class="video-card-kicker">${video.type} / Short Form</div>
+        <div class="video-card-title">${video.title}</div>
+      `;
+      
+      article.appendChild(thumbnailDiv);
+      article.appendChild(badge);
+      article.appendChild(playBtn);
+      article.appendChild(overlay);
+      grid.appendChild(article);
+    });
+    
+    // Re-run reveal animation for new elements
+    const newRevealEls = grid.querySelectorAll('.reveal:not(.visible)');
+    newRevealEls.forEach(el => observer.observe(el));
+  }
+
+  function playVideo(videoFile) {
+    const modal = document.getElementById('videoModal');
+    const videoElement = document.getElementById('modalVideo');
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    videoElement.src = videoFile;
+    modal.classList.add('open');
+    // Hide custom cursor during video playback
+    if (cursor) cursor.style.display = 'none';
+    if (cursorRing) cursorRing.style.display = 'none';
+    document.body.style.cursor = 'auto';
+    videoElement.play();
+  }
+
+  function closeVideoModal() {
+    const modal = document.getElementById('videoModal');
+    const videoElement = document.getElementById('modalVideo');
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    modal.classList.remove('open');
+    videoElement.pause();
+    videoElement.src = '';
+    // Show custom cursor after video
+    if (cursor) cursor.style.display = 'block';
+    if (cursorRing) cursorRing.style.display = 'block';
+    document.body.style.cursor = 'none';
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeVideoModal();
+  });
+
+  // Render videos on page load
+  renderVideoGrid();

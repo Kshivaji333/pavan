@@ -132,7 +132,7 @@
     <div class="projects-header reveal" style="--delay: 0;">
       <div>
         <div class="section-label">Selected Works</div>
-        <h2 class="section-title" style="margin-bottom:0;">Projects</h2>
+        <h2 class="section-title" style="margin-bottom:0;">My Work</h2>
       </div>
       <a href="#contact" class="btn-primary" style="opacity:1; animation:none;">Work With Me <span
           class="arrow">→</span></a>
@@ -140,74 +140,19 @@
 
     <div class="video-groups">
       <div class="video-group">
-        <h3 class="video-group-title reveal" style="--delay: 0.05;">
-          Short Form Content <span class="count">/ 03 WORKS</span>
-        </h3>
-        <div class="video-grid short-form">
-          <article class="video-card short reveal" style="--delay: 0.1;">
-            <div class="video-thumb thumb-1"></div>
-            <div class="video-badge">REEL</div>
-            <div class="play-btn"><svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg></div>
-            <div class="video-card-overlay">
-              <div class="video-card-kicker">TikTok / Reels</div>
-              <div class="video-card-title">Dynamic Cuts</div>
-            </div>
-          </article>
-          <article class="video-card short reveal" style="--delay: 0.18;">
-            <div class="video-thumb thumb-2"></div>
-            <div class="video-badge">CLIP</div>
-            <div class="play-btn"><svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg></div>
-            <div class="video-card-overlay">
-              <div class="video-card-kicker">YouTube Shorts</div>
-              <div class="video-card-title">Podcast Clip</div>
-            </div>
-          </article>
-          <article class="video-card short reveal" style="--delay: 0.26;">
-            <div class="video-thumb thumb-3"></div>
-            <div class="video-badge">PROMO</div>
-            <div class="play-btn"><svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg></div>
-            <div class="video-card-overlay">
-              <div class="video-card-kicker">Brand Promo</div>
-              <div class="video-card-title">Brand Teaser</div>
-            </div>
-          </article>
+        <div class="video-grid short-form" id="videoGrid">
         </div>
       </div>
+    </div>
 
-      <div class="video-group">
-        <h3 class="video-group-title reveal" style="--delay: 0.05;">
-          Long Form Content <span class="count">/ 02 WORKS</span>
-        </h3>
-        <div class="video-grid long-form">
-          <article class="video-card long reveal" style="--delay: 0.1;">
-            <div class="video-thumb thumb-4"></div>
-            <div class="video-badge">DOC</div>
-            <div class="play-btn"><svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg></div>
-            <div class="video-card-overlay">
-              <div class="video-card-kicker">YouTube Video</div>
-              <div class="video-card-title">Documentary Style Edit</div>
-            </div>
-          </article>
-          <article class="video-card long reveal" style="--delay: 0.2;">
-            <div class="video-thumb thumb-5"></div>
-            <div class="video-badge">AD</div>
-            <div class="play-btn"><svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg></div>
-            <div class="video-card-overlay">
-              <div class="video-card-kicker">Commercial</div>
-              <div class="video-card-title">Cinematic Ad Campaign</div>
-            </div>
-          </article>
-        </div>
+    <!-- VIDEO MODAL -->
+    <div class="video-modal" id="videoModal">
+      <div class="video-modal-overlay" onclick="closeVideoModal()"></div>
+      <div class="video-modal-content">
+        <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
+        <video id="modalVideo" controls style="width: 100%; max-height: 85vh; max-width: 90vw;">
+          Your browser does not support the video tag.
+        </video>
       </div>
     </div>
   </section>
